@@ -111,11 +111,5 @@ t.test('both max and maxSize', t =>
     max,
   })))
 
-t.test('no max, only maxSize', t =>
-  runTest(t, new LRUCache({
-    maxSize,
-    sizeCalculation: s => s.length,
-  })))
-
 t.test('only max, no maxSize', t =>
   runTest(t, new LRUCache({ max })))
