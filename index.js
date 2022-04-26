@@ -61,7 +61,7 @@ class LRUCache {
       if (max !== 0 && !isPosInt(max)) {
         throw new TypeError('max option must be a nonnegative integer')
       }
-      
+
       if (!UintArray) {
         throw new Error('invalid max value: ' + max)
       }
@@ -92,10 +92,6 @@ class LRUCache {
     }
   }
 
-  getRemainingTTL (key) {
-    return this.has(key) ? Infinity : 0
-  }
-
   initializeTTLTracking () {
     this.ttls = new ZeroArray(this.max)
     this.starts = new ZeroArray(this.max)
@@ -123,15 +119,6 @@ class LRUCache {
         }
       }
       return n
-    }
-
-    this.getRemainingTTL = (key) => {
-      const index = this.keyMap.get(key)
-      if (index === undefined) {
-        return 0
-      }
-      return this.ttls[index] === 0 || this.starts[index] === 0 ? Infinity
-        : ((this.starts[index] + this.ttls[index]) - (cachedNow || getNow()))
     }
 
     this.isStale = (index) => {
