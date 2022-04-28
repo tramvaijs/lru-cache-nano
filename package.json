@@ -1,5 +1,5 @@
 {
-  "name": "lru-cache",
+  "name": "@tinkoff/lru-cache-nano",
   "description": "A cache object that deletes the least-recently-used items.",
   "version": "7.8.1",
   "author": "Isaac Z. Schlueter <i@izs.me>",
@@ -19,7 +19,7 @@
   },
   "main": "index.js",
   "typings": "index.d.ts",
-  "repository": "git://github.com/isaacs/node-lru-cache.git",
+  "repository": "https://github.com/Tinkoff/lru-cache-nano",
   "devDependencies": {
     "@size-limit/preset-small-lib": "^7.0.8",
     "benchmark": "^2.1.4",
@@ -37,6 +37,9 @@
   },
   "tap": {
     "coverage-map": "map.js",
+    "statements": "90",
+    "lines": "90",
+    "branches": "90",
     "node-arg": [
       "--expose-gc"
     ]
