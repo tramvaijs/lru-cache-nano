@@ -65,6 +65,16 @@ declare class LRUCache<K, V> {
    * Evict the least recently used item, returning its value or `undefined` if cache is empty.
    */
   public pop(): V | undefined;
+
+  /**
+   * Return an array of [key, {@link LRUCache.Entry}] pairs for cache.load() method
+   */
+  public dump(): [K, LRUCache.Entry<V>][];
+
+  /**
+   * Reset the cache and load in the items in entries in the order listed.
+   */
+  public load(arr: [K, LRUCache.Entry<V>][]);
 }
 
 declare namespace LRUCache {
@@ -172,6 +182,16 @@ declare namespace LRUCache {
 
   interface PeekOptions {
       allowStale?: boolean;
+  }
+
+  /**
+   * Entry objects used by {@link LRUCache_load} and {@link LRUCache_dump}
+   */
+  export interface Entry<V> {
+    value: V
+    ttl?: Milliseconds
+    size?: Size
+    start?: Milliseconds
   }
 }
 
