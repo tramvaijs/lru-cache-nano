@@ -12,20 +12,20 @@ const isPosInt = n => n && n === Math.floor(n) && n > 0 && isFinite(n)
  * But why not be complete?
  * Maybe in the future, these limits will have expanded. */
 const getUintArray = max => max <= Math.pow(2, 8) ? Uint8Array
-: max <= Math.pow(2, 16) ? Uint16Array
-: max <= Math.pow(2, 32) ? Uint32Array
-: max <= Number.MAX_SAFE_INTEGER ? ZeroArray
-: null
+  : max <= Math.pow(2, 16) ? Uint16Array
+    : max <= Math.pow(2, 32) ? Uint32Array
+      : max <= Number.MAX_SAFE_INTEGER ? ZeroArray
+        : null
 
 class ZeroArray extends Array {
-  constructor (size) {
+  constructor(size) {
     super(size)
     this.fill(0)
   }
 }
 
 class Stack {
-  constructor (max) {
+  constructor(max) {
     if (max === 0) {
       return []
     }
@@ -33,16 +33,16 @@ class Stack {
     this.heap = new UintArray(max)
     this.length = 0
   }
-  push (n) {
+  push(n) {
     this.heap[this.length++] = n
   }
-  pop () {
+  pop() {
     return this.heap[--this.length]
   }
 }
 
 class LRUCache {
-  constructor (options = {}) {
+  constructor(options = {}) {
     const {
       max = 0,
       ttl,
@@ -92,7 +92,7 @@ class LRUCache {
     }
   }
 
-  initializeTTLTracking () {
+  initializeTTLTracking() {
     this.ttls = new ZeroArray(this.max)
     this.starts = new ZeroArray(this.max)
 
@@ -126,11 +126,11 @@ class LRUCache {
         ((cachedNow || getNow()) - this.starts[index] > this.ttls[index])
     }
   }
-  updateItemAge (index) {}
-  setItemTTL (index, ttl) {}
-  isStale (index) { return false }
+  updateItemAge(index) { }
+  setItemTTL(index, ttl) { }
+  isStale(index) { return false }
 
-  set (k, v, {
+  set(k, v, {
     ttl = this.ttl,
   } = {}) {
     let index = this.size === 0 ? undefined : this.keyMap.get(k)
@@ -143,7 +143,7 @@ class LRUCache {
       this.next[this.tail] = index
       this.prev[index] = this.tail
       this.tail = index
-      this.size ++
+      this.size++
     } else {
       // update
       const oldVal = this.valList[index]
@@ -160,7 +160,7 @@ class LRUCache {
     return this
   }
 
-  newIndex () {
+  newIndex() {
     if (this.size === 0) {
       return this.tail
     }
@@ -174,7 +174,7 @@ class LRUCache {
     return this.initialFill++
   }
 
-  pop () {
+  pop() {
     if (this.size) {
       const val = this.valList[this.head]
       this.evict(true)
@@ -182,7 +182,7 @@ class LRUCache {
     }
   }
 
-  evict (free) {
+  evict(free) {
     const head = this.head
     const k = this.keyList[head]
     // if we aren't about to use the index, then null these out
@@ -193,11 +193,11 @@ class LRUCache {
     }
     this.head = this.next[head]
     this.keyMap.delete(k)
-    this.size --
+    this.size--
     return head
   }
 
-  has (k) {
+  has(k) {
     const index = this.keyMap.get(k)
     if (index !== undefined) {
       if (!this.isStale(index)) {
@@ -208,14 +208,14 @@ class LRUCache {
   }
 
   // like get(), but without any LRU updating or TTL expiration
-  peek (k, { allowStale = this.allowStale } = {}) {
+  peek(k, { allowStale = this.allowStale } = {}) {
     const index = this.keyMap.get(k)
     if (index !== undefined && (allowStale || !this.isStale(index))) {
       return this.valList[index]
     }
   }
 
-  get (k, {
+  get(k, {
     allowStale = this.allowStale,
     updateAgeOnGet = this.updateAgeOnGet,
   } = {}) {
@@ -235,12 +235,12 @@ class LRUCache {
     }
   }
 
-  connect (p, n) {
+  connect(p, n) {
     this.prev[n] = p
     this.next[p] = n
   }
 
-  moveToTail (index) {
+  moveToTail(index) {
     // if tail already, nothing to do
     // if head, move head to next[index]
     // else
@@ -260,7 +260,7 @@ class LRUCache {
     }
   }
 
-  delete (k) {
+  delete(k) {
     let deleted = false
     if (this.size !== 0) {
       const index = this.keyMap.get(k)
@@ -280,7 +280,7 @@ class LRUCache {
             this.next[this.prev[index]] = this.next[index]
             this.prev[this.next[index]] = this.prev[index]
           }
-          this.size --
+          this.size--
           this.free.push(index)
         }
       }
@@ -288,7 +288,7 @@ class LRUCache {
     return deleted
   }
 
-  clear () {
+  clear() {
     this.keyMap.clear()
     this.valList.fill(null)
     this.keyList.fill(null)
@@ -301,6 +301,89 @@ class LRUCache {
     this.initialFill = 1
     this.free.length = 0
     this.size = 0
+  }
+
+  /**
+   * Return an array of [key, {@link LRUCache.Entry}] tuples which can be
+   * passed to cache.load()
+   */
+  dump() {
+    const arr = []
+
+    for (const i of this.indexes()) {
+      const key = this.keyList[i]
+      const value = this.valList[i]
+
+      if (value === undefined || key === undefined) {
+        continue
+      }
+
+      const entry = { value }
+
+      if (this.ttls && this.starts) {
+        entry.ttl = this.ttls[i]
+        // always dump the start relative to a portable timestamp
+        // it's ok for this to be a bit slow, it's a rare operation.
+        const age = perf.now() - (this.starts[i])
+        entry.start = Math.floor(Date.now() - age)
+      }
+
+      if (this.sizes) {
+        entry.size = this.sizes[i]
+      }
+
+      arr.unshift([key, entry])
+    }
+    return arr
+  }
+
+  /**
+   * Reset the cache and load in the items in entries in the order listed.
+   * Note that the shape of the resulting cache may be different if the
+   * same options are not used in both caches.
+   */
+  load(arr) {
+    this.clear()
+
+    for (const [key, entry] of arr) {
+      if (entry.start) {
+        // entry.start is a portable timestamp, but we may be using
+        // node's performance.now(), so calculate the offset, so that
+        // we get the intended remaining TTL, no matter how long it's
+        // been on ice.
+        //
+        // it's ok for this to be a bit slow, it's a rare operation.
+        const age = Date.now() - entry.start
+        entry.start = perf.now() - age
+      }
+
+      this.set(key, entry.value, entry)
+    }
+  }
+
+  *indexes() {
+    if (this.size) {
+      for (let i = this.tail; true;) {
+        if (!this.isValidIndex(i)) {
+          break
+        }
+
+        yield i
+
+        if (i === this.head) {
+          break
+        } else {
+          i = this.prev[i]
+        }
+      }
+    }
+  }
+
+  isValidIndex(index) {
+    return (
+      index !== undefined &&
+      this.keyMap.get(this.keyList[index]) === index
+    )
   }
 }
 
