@@ -16,17 +16,18 @@
     "test": "tap",
     "snap": "tap",
     "size": "size-limit",
-    "preversion": "npm test",
-    "postversion": "npm publish",
-    "prepublishOnly": "git push origin --follow-tags"
+    "release": "release-it",
+    "release:dry": "release-it --dry-run"
   },
   "main": "index.js",
   "typings": "index.d.ts",
   "repository": "https://github.com/tramvaijs/lru-cache-nano",
   "devDependencies": {
+    "@release-it/conventional-changelog": "^8.0.1",
     "@size-limit/preset-small-lib": "^7.0.8",
     "benchmark": "^2.1.4",
     "clock-mock": "^1.0.4",
+    "release-it": "^17.0.0",
     "size-limit": "^7.0.8",
     "tap": "^15.1.6"
   },
