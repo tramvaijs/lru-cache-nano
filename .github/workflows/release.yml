@@ -1,0 +1,35 @@
+name: release
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}
+
+jobs:
+  release:
+    if: "!contains(github.event.head_commit.message, 'chore(release)')"
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Initialize Git user
+        run: |
+          git config --global user.name 'Tramvai Conductor'
+          git config --global user.email 'tramvai-conductor@users.noreply.github.com'
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Release packages
+        run: npm run release

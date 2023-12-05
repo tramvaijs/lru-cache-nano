@@ -10,7 +10,7 @@ jobs:
   makework:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Use Node.js
@@ -22,8 +22,8 @@ jobs:
       - name: check in package.json if modified
         run: |
           bash -x .github/workflows/commit-if-modified.sh \
-            "package-json-repo-bot@example.com" \
-            "package.json Repo Bot" \
+            "tramvai-conductor@users.noreply.github.com" \
+            "Tramvai Conductor" \
             "chore: add repo to package.json" \
             package.json package-lock.json
       - name: put all dates in license copyright line
@@ -31,7 +31,7 @@ jobs:
       - name: check in licenses if modified
         run: |
           bash .github/workflows/commit-if-modified.sh \
-            "license-year-bot@example.com" \
-            "License Year Bot" \
+            "tramvai-conductor@users.noreply.github.com" \
+            "Tramvai Conductor" \
             "chore: add copyright year to license" \
             LICENSE*
