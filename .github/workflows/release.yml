@@ -3,7 +3,7 @@ name: release
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
