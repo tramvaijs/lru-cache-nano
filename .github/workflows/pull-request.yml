@@ -1,21 +1,52 @@
-name: "pull request"
+name: Pull request
 
-on:
-  pull_request:
-    branches:
-      - main
+on: [pull_request]
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}
 
 jobs:
-  size:
-    runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 1
+  build-and-test:
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        platform:
+          - os: ubuntu-latest
+            shell: bash
+          - os: macos-latest
+            shell: bash
+          # Skip workflow on Windows due to `npm install npm -g` fails
+          #- os: windows-latest
+          #  shell: bash
+      fail-fast: false
+
+    runs-on: ${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.platform.shell }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Use Nodejs ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 20.x
-      - uses: andresz1/size-limit-action@v1
-        with:
-          github_token: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Use latest npm
+        run: npm i -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test -- -c -t0
+
+      - name: Check release
+        run: npm run release:dry
