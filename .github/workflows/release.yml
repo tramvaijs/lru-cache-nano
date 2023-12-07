@@ -8,7 +8,6 @@ on:
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}
 
 jobs:
   release:
@@ -25,6 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}
 
       - uses: actions/setup-node@v3
         with:
@@ -36,3 +36,5 @@ jobs:
 
       - name: Release packages
         run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}

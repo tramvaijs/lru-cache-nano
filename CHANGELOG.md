@@ -1,5 +1,7 @@
 # Changelog
 
+## [7.9.2](https://github.com/tramvaijs/lru-cache-nano/compare/v7.9.0...v7.9.2) (2023-12-07)
+
 ## [7.9.1](https://github.com/tramvaijs/lru-cache-nano/compare/v7.9.0...v7.9.1) (2023-12-07)
 
 ## 7.8.0
